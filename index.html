@@ -2,273 +2,305 @@
 <html lang="zh">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Legacy Planner Final Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legacy Planner – Final Edition (PWA)</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#D4AF37">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
-  :root{--bg:#111111;--ink:#f5f5f5;--muted:#cbd5e1;--line:#333333;--head:#1f1f1f;--pri:#D4AF37;}
+  :root{--bg:#111;--ink:#f5f5f5;--muted:#cbd5e1;--line:#333;--head:#1b1b1b;--pri:#D4AF37}
   *{box-sizing:border-box}
-  body{font-family:Arial, Helvetica, 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;margin:0;background:var(--bg);color:var(--ink)}
-  header{position:sticky;top:0;background:#000;border-bottom:1px solid var(--line);padding:10px}
-  .bar{max-width:1100px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .title{font-size:18px;margin:0 8px 0 0;flex:1;font-weight:800;color:#D4AF37;letter-spacing:.3px}
-  .logo{width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #444;box-shadow:0 0 0 2px #000 inset}
-  select,input[type=number]{padding:8px;border:1px solid var(--line);border-radius:10px;background:#0f0f0f;color:#fff}
-  button{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#0f0f0f;color:#fff;cursor:pointer}
-  button.primary{background:var(--pri);color:#111;border-color:#D4AF37;font-weight:700}
-
-  main{max-width:1100px;margin:12px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+  header{position:sticky;top:0;background:#000;border-bottom:1px solid var(--line);padding:10px 12px;z-index:10}
+  .bar{max-width:1200px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .title{font-size:18px;margin:0 8px 0 0;flex:1;font-weight:800;color:var(--pri);letter-spacing:.3px}
+  .logo{width:44px;height:44px;border-radius:50%;border:1px solid #444;overflow:hidden;display:inline-block}
+  .logo img{width:100%;height:100%;object-fit:cover;display:block}
+  select,input[type=number],input[type=checkbox]{padding:10px;border:1px solid var(--line);border-radius:10px;background:#0f0f0f;color:#fff;-webkit-appearance:none;appearance:none}
+  input[type=checkbox]{width:18px;height:18px;vertical-align:middle;border-radius:4px}
+  button{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#0f0f0f;color:#fff;cursor:pointer}
+  button.primary{background:var(--pri);color:#111;border-color:var(--pri);font-weight:700}
+  main{max-width:1200px;margin:12px auto;padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .card{background:#0d0d0d;border:1px solid var(--line);border-radius:14px;padding:12px}
   h2{font-size:16px;margin:6px 0 8px;color:#D4AF37}
   label{font-weight:700;margin-bottom:4px;display:block}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  thead th{background:var(--head);color:#e5e7eb;font-weight:700;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px;-webkit-font-smoothing:antialiased}
+  thead th{background:var(--head);color:#e5e7eb;font-weight:700;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;position:sticky;top:0}
   tbody td{border-top:1px solid var(--line);padding:6px;color:#f3f4f6}
   th:first-child,td:first-child{text-align:center}
   td{text-align:right}
   td.left{text-align:left}
   .small{font-size:12px;color:#a1a1aa}
   .btns{display:flex;gap:8px;flex-wrap:wrap}
-  @media(max-width:900px){main{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+  .note{background:#111827;border:1px dashed #444;border-radius:10px;padding:8px;margin-top:8px;color:#cbd5e1}
+  .muted{color:#9ca3af}
+  .span2{grid-column:span 2}
+  @media(max-width:1000px){main{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
   @media print{header{position:static} .no-print{display:none!important} body{background:#fff;color:#111} .card{page-break-inside:avoid}}
 </style>
 </head>
 <body>
   <header>
     <div class="bar">
-      <img class="logo" alt="MME Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjcwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSJ1cmwoI2JnKSIvPgogIDwhLS0gcmluZyAtLT4KICA8cGF0aCBkPSJNMTI4IDIyMGExNjAgMTYwIDAgMCAxIDI3Mi00NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNWRkMWZmIiBzdHJva2Utd2lkdGg9IjM0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMzg0IDE0MGExNjAgMTYwIDAgMSAxLTE2IDI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWUzYThhIiBzdHJva2Utd2lkdGg9IjM0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMzYwIDM5MmExNjAgMTYwIDAgMCAxLTIzMi0xMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIyYzU1ZSIgc3Ryb2tlLXdpZHRoPSIzNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBNTUUgdGV4dCAtLT4KICA8ZyBmaWxsPSIjZmZmIj4KICAgIDxwYXRoIGQ9Ik0xMjggMjUyYzAtMjggMjItNTAgNTAtNTBoMTZjMjAgMCAzOCAxMiA0NiAzMGM4LTE4IDI2LTMwIDQ2LTMwaDE2YzI4IDAgNTAgMjIgNTAgNTB2NzBjMCAxMS05IDIwLTIwIDIwcy0yMC05LTIwLTIwdi03MGMwLTYtNC0xMC0xMC0xMGgtMTZjLTYgMC0xMCA0LTEwIDEwdjcwYzAgMTEtOSAyMC0yMCAyMHMtMjAtOS0yMC0yMHYtNzBjMC02LTQtMTAtMTAtMTBoLTE2Yy02IDAtMTAgNC0xMCAxMHY3MGMwIDExLTkgMjAtMjAgMjBzLTIwLTktMjAtMjB2LTcweiIvPgogICAgPHJlY3QgeD0iMzU2IiB5PSIyMTIiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxMzAiIHJ4PSIyMCIvPgogIDwvZz4KPC9zdmc+">
-      <h1 class="title">Legacy Planner Final Edition</h1>
-      <label class="small" for="lang" data-i18n="lang">语言</label>
-      <select id="lang">
-        <option value="zh">简体中文</option>
-        <option value="en">English</option>
-      </select>
-      <button id="printBtn" class="no-print" data-i18n="export">导出 PDF</button>
+      <span class="logo"><img alt="MME Logo" src="icon.svg"></span>
+      <h1 class="title">Legacy Planner – Final Edition (PWA)</h1>
+      <button id="printBtn" class="no-print">导出 PDF</button>
     </div>
   </header>
 
   <main>
-    <section class="card">
-      <h2 data-i18n="inputs">输入</h2>
+    <section class="card span2">
+      <h2>基础输入</h2>
       <div class="grid">
-        <div><label data-i18n="p1p">PWT 1F10 本金（一次性）</label><input id="p1P" type="number" value="300000" min="0" step="1000"></div>
-        <div><label data-i18n="p1m">PWT 1F10 收益模式</label>
+        <div><label>PWT 1F10 本金（一次性）</label><input id="p1P" type="number" value="300000" min="0" step="1000" inputmode="numeric"></div>
+        <div><label>PWT 1F10 收益模式</label>
           <select id="p1Mode">
-            <option value="annual" data-i18n="annual">年付10%</option>
-            <option value="monthly" data-i18n="monthly">月付0.8%（≈9.6%/年）</option>
+            <option value="annual">年付10%</option>
+            <option value="monthly">月付0.8%（≈9.6%/年）</option>
           </select>
         </div>
-        <div><label data-i18n="p2p">PWT 3F10 总本金（分3年等额）</label><input id="p2P" type="number" value="300000" min="0" step="1000"></div>
-        <div><label data-i18n="p3p">PWT 3F5 总本金（分3年等额）</label><input id="p3P" type="number" value="300000" min="0" step="1000"></div>
-        <div><label data-i18n="sa">ALWB 保额</label><input id="sa" type="number" value="1000000" min="0" step="10000"></div>
-        <div><label data-i18n="prem">ALWB 年保费</label><input id="prem" type="number" value="100000" min="0" step="1000"></div>
-        <div><label data-i18n="premY">ALWB 缴费年数</label><input id="premYrs" type="number" value="10" min="0"></div>
+        <div><label>PWT 3F10 总本金（分3年等额）</label><input id="p2P" type="number" value="150000" min="0" step="1000" inputmode="numeric"></div>
+        <div><label>PWT 3F5 总本金（分3年等额）</label><input id="p3P" type="number" value="300000" min="0" step="1000" inputmode="numeric"></div>
+        <div><label>ALWB 保额</label><input id="sa" type="number" value="1000000" min="0" step="10000" inputmode="numeric"></div>
+        <div><label>ALWB 年保费</label><input id="prem" type="number" value="9000" min="0" step="100" inputmode="numeric"></div>
+        <div><label>ALWB 缴费年数</label><input id="premYrs" type="number" value="10" min="1" inputmode="numeric"></div>
       </div>
-      <div class="small" data-i18n="note">Octowill：利息=年利率×已投入本金（不复利）；分红只按第一年本金。ALWB：只显示保额与累计保费。</div>
+      <div class="small">Octowill：利息=年利率×已投入本金（不复利）；分红只按第一年本金。ALWB：只显示保额与累计保费。</div>
       <div class="btns no-print" style="margin-top:8px">
-        <button id="calc" class="primary" data-i18n="calc">计算</button>
-        <button id="reset" data-i18n="reset">重置</button>
+        <button id="calc" class="primary">计算</button>
+        <button id="reset">重置</button>
       </div>
     </section>
 
-    <section class="card">
-      <h2 data-i18n="summary">汇总</h2>
+    <section class="card span2">
+      <h2>汇总</h2>
       <table>
-        <thead>
-          <tr><th data-i18n="item">项目</th><th>PWT 1F10</th><th>PWT 3F10</th><th>PWT 3F5</th><th>ALWB</th></tr>
-        </thead>
+        <thead><tr><th>项目</th><th>PWT 1F10</th><th>PWT 3F10</th><th>PWT 3F5</th><th>ALWB</th></tr></thead>
         <tbody id="summary"></tbody>
       </table>
     </section>
 
     <section class="card">
-      <h2>PWT 1F10 <span data-i18n="detail">明细</span> (10)</h2>
+      <h2>PWT 1F10 明细 (10)</h2>
       <table>
-        <thead>
-          <tr>
-            <th data-i18n="year">Year</th>
-            <th data-i18n="trustAmt">Trust Amount (RM)</th>
-            <th data-i18n="accTrust">Accumulated Trust Amount (RM)</th>
-            <th data-i18n="retPct">Target Return (%)</th>
-            <th data-i18n="retRm">Target Return (RM)</th>
-            <th data-i18n="bonusPct">Additional Bonus (%)</th>
-            <th data-i18n="bonusRm">Additional Bonus (RM)</th>
-            <th data-i18n="principalBack">Principal Back (RM)</th>
-            <th data-i18n="annual">Annual Payout (RM)</th>
-            <th data-i18n="accum">Accumulation (RM)</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Year</th><th>Trust Amount (RM)</th><th>Accumulated Trust (RM)</th>
+          <th>Target Return (%)</th><th>Target Return (RM)</th>
+          <th>Additional Bonus (%)</th><th>Additional Bonus (RM)</th>
+          <th>Principal Back (RM)</th><th>Annual Payout (RM)</th><th>Accumulation (RM)</th>
+        </tr></thead>
         <tbody id="tb1"></tbody>
         <tfoot><tr><td class="left" colspan="10" id="mult1"></td></tr></tfoot>
       </table>
     </section>
 
     <section class="card">
-      <h2>PWT 3F10 <span data-i18n="detail">明细</span> (10)</h2>
+      <h2>PWT 3F10 明细 (10)</h2>
       <table>
-        <thead>
-          <tr>
-            <th data-i18n="year">Year</th>
-            <th data-i18n="trustAmt">Trust Amount (RM)</th>
-            <th data-i18n="accTrust">Accumulated Trust Amount (RM)</th>
-            <th data-i18n="retPct">Target Return (%)</th>
-            <th data-i18n="retRm">Target Return (RM)</th>
-            <th data-i18n="bonusPct">Additional Bonus (%)</th>
-            <th data-i18n="bonusRm">Additional Bonus (RM)</th>
-            <th data-i18n="principalBack">Principal Back (RM)</th>
-            <th data-i18n="annual">Annual Payout (RM)</th>
-            <th data-i18n="accum">Accumulation (RM)</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Year</th><th>Trust Amount (RM)</th><th>Accumulated Trust (RM)</th>
+          <th>Target Return (%)</th><th>Target Return (RM)</th>
+          <th>Additional Bonus (%)</th><th>Additional Bonus (RM)</th>
+          <th>Principal Back (RM)</th><th>Annual Payout (RM)</th><th>Accumulation (RM)</th>
+        </tr></thead>
         <tbody id="tb2"></tbody>
         <tfoot><tr><td class="left" colspan="10" id="mult2"></td></tr></tfoot>
       </table>
     </section>
 
     <section class="card">
-      <h2>PWT 3F5 <span data-i18n="detail">明细</span> (5)</h2>
+      <h2>PWT 3F5 明细 (5)</h2>
       <table>
-        <thead>
-          <tr>
-            <th data-i18n="year">Year</th>
-            <th data-i18n="trustAmt">Trust Amount (RM)</th>
-            <th data-i18n="accTrust">Accumulated Trust Amount (RM)</th>
-            <th data-i18n="retPct">Target Return (%)</th>
-            <th data-i18n="retRm">Target Return (RM)</th>
-            <th data-i18n="bonusPct">Additional Bonus (%)</th>
-            <th data-i18n="bonusRm">Additional Bonus (RM)</th>
-            <th data-i18n="principalBack">Principal Back (RM)</th>
-            <th data-i18n="annual">Annual Payout (RM)</th>
-            <th data-i18n="accum">Accumulation (RM)</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th>Year</th><th>Trust Amount (RM)</th><th>Accumulated Trust (RM)</th>
+          <th>Target Return (%)</th><th>Target Return (RM)</th>
+          <th>Additional Bonus (%)</th><th>Additional Bonus (RM)</th>
+          <th>Principal Back (RM)</th><th>Annual Payout (RM)</th><th>Accumulation (RM)</th>
+        </tr></thead>
         <tbody id="tb3"></tbody>
         <tfoot><tr><td class="left" colspan="10" id="mult3"></td></tr></tfoot>
+      </table>
+    </section>
+
+    <section class="card span2">
+      <h2>Premium 对冲（自动采用：<span class="muted">PWT 3F10 本金</span> 与 <span class="muted">ALWB 年保费</span>）</h2>
+      <div class="grid">
+        <div><label>（只读）PWT 3F10 总本金</label><input id="trustTotal" type="number" value="150000" disabled></div>
+        <div><label>（只读）ALWB 年保费</label><input id="lifePrem" type="number" value="9000" disabled></div>
+        <div><label>缴费年数</label><input id="lifeYears" type="number" value="10" min="1" inputmode="numeric"></div>
+        <div><label><input type="checkbox" id="inclBonus"> 计入分红（3F10：第3年2%、第6年4%、第10年10%）</label></div>
+      </div>
+      <div class="note">规则：第 y 年保费用第 (y-1) 年利息（+ 可选分红）对冲。利息按当年末“已投入本金总额 × 9%”计算；不复利。注资：PWT 3F10 为 3 年均分注资。</div>
+      <div class="btns no-print" style="margin-top:8px">
+        <button id="btnPrem" class="primary">计算 Premium 对冲</button>
+      </div>
+      <table style="margin-top:8px">
+        <thead><tr>
+          <th>Year</th><th>Trust Amount (RM)</th><th>Accumulated Trust (RM)</th>
+          <th>Interest From Trust (RM)</th><th>Life Insurance (RM)</th>
+          <th>Bonuses (RM)</th><th>Money Into Pocket (RM)</th>
+        </tr></thead>
+        <tbody id="tbPremium"></tbody>
+        <tfoot><tr><td class="left" colspan="7" id="premSummary"></td></tr></tfoot>
       </table>
     </section>
   </main>
 
 <script>
-// Register SW
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js'));
+// Register SW for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  });
+}
 
-(function(){
-  const dict={zh:{lang:"语言",export:"导出 PDF",inputs:"输入",
-    p1p:"PWT 1F10 本金（一次性）",p1m:"PWT 1F10 收益模式",p2p:"PWT 3F10 总本金（分3年等额）",p3p:"PWT 3F5 总本金（分3年等额）",
-    sa:"ALWB 保额",prem:"ALWB 年保费",premY:"ALWB 缴费年数",note:"Octowill：利息=年利率×已投入本金（不复利）；分红只按第一年本金。ALWB：只显示保额与累计保费。",
-    calc:"计算",reset:"重置",summary:"汇总",item:"项目",detail:"明细",
-    year:"年份",trustAmt:"当年新增投入 (RM)",accTrust:"累计投入本金 (RM)",retPct:"目标回报 (%)",retRm:"目标回报 (RM)",
-    bonusPct:"额外分红 (%)",bonusRm:"额外分红 (RM)",principalBack:"返还本金 (RM)",annual:"当年派发 (RM)",accum:"累计派发 (RM)",
-    annualLbl:"年付10%",monthlyLbl:"月付0.8%（≈9.6%/年）",mult:"Return after {n} years = {x} times"},
-    en:{lang:"Language",export:"Export PDF",inputs:"Inputs",
-    p1p:"PWT 1F10 Principal (lump sum)",p1m:"PWT 1F10 Payout Mode",p2p:"PWT 3F10 Total Principal (3-year injection)",p3p:"PWT 3F5 Total Principal (3-year injection)",
-    sa:"ALWB Sum Assured",prem:"ALWB Annual Premium",premY:"ALWB Premium Years",note:"Octowill: Interest = rate × invested principal (no compounding). Bonuses base on year-1 principal only. ALWB shows SA & total premiums.",
-    calc:"Calculate",reset:"Reset",summary:"Summary",item:"Item",detail:"Breakdown",
-    year:"Year",trustAmt:"Trust Amount (RM)",accTrust:"Accumulated Trust Amount (RM)",retPct:"Target Return (%)",retRm:"Target Return (RM)",
-    bonusPct:"Additional Bonus (%)",bonusRm:"Additional Bonus (RM)",principalBack:"Principal Back (RM)",annual:"Annual Payout (RM)",accum:"Accumulation (RM)",
-    annualLbl:"Annual 10%",monthlyLbl:"Monthly 0.8% (~9.6% p.a.)",mult:"Return after {n} years = {x} times"}};
-  let lang="zh";
-  function t(k){return (dict[lang]&&dict[lang][k])||k;}
-  function applyI18n(){
-    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n"); if(dict[lang][k]) el.textContent=dict[lang][k];});
-    document.querySelector('#p1Mode option[value="annual"]').textContent=t("annualLbl");
-    document.querySelector('#p1Mode option[value="monthly"]').textContent=t("monthlyLbl");
-  }
-
+document.addEventListener('DOMContentLoaded', function(){
   const $=id=>document.getElementById(id);
-  const fmt=n=>(Math.round(n)||0).toLocaleString();
-  const RM=n=>"RM "+fmt(n);
+  const RM=n=>"RM "+((Math.round(n)||0).toLocaleString());
+  function fill(tbodyId, rows){
+    const tb=$(tbodyId); let html="";
+    rows.forEach(r=>{ html+=`<tr>
+      <td>${r.y}</td><td>${RM(r.trustAmount)}</td><td>${RM(r.accTrust)}</td>
+      <td>${r.retPct}%</td><td>${RM(r.retAmt)}</td>
+      <td>${r.bonusPct? r.bonusPct+'%':''}</td><td>${RM(r.bonusAmt)}</td>
+      <td>${RM(r.principalBack)}</td><td>${RM(r.annual)}</td><td>${RM(r.cum)}</td>
+    </tr>`; });
+    tb.innerHTML=html;
+  }
+  function totals(rows){return {
+    int: rows.reduce((s,r)=>s+r.retAmt,0),
+    bonus: rows.reduce((s,r)=>s+r.bonusAmt,0),
+    payout: rows.reduce((s,r)=>s+r.annual,0),
+    principal: rows.length? rows[rows.length-1].accTrust:0
+  };}
 
   function rowsPWT1(P, mode){
-    const r=(mode==="annual")?0.10:(0.008*12);
-    const retPct=(mode==="annual")?10.0:9.6;
+    const r=(mode==='annual')?0.10:(0.008*12), retPct=(mode==='annual')?10.0:9.6;
     const term=10; const rows=[]; let cum=0;
-    for(let y=1;y<=term;y++){ 
+    for(let y=1;y<=term;y++){
       const trustAmount=(y===1)?P:0, accTrust=P;
-      const retAmt=P*r; const bonusPct=0, bonusAmt=0;
-      const principalBack=(y===term)?P:0;
-      const annual=retAmt+bonusAmt+principalBack; cum+=annual;
+      const retAmt=P*r, bonusPct=0, bonusAmt=0;
+      const principalBack=(y===term)?P:0, annual=retAmt+bonusAmt+principalBack; cum+=annual;
       rows.push({y,trustAmount,accTrust,retPct,retAmt,bonusPct,bonusAmt,principalBack,annual,cum});
     }
     return rows;
   }
   function rows3F10(T){
     const term=10, r=0.09, y1=T/3; let inv=0, cum=0; const rows=[];
-    for(let y=1;y<=term;y++){ 
+    for(let y=1;y<=term;y++){
       const trustAmount=(y<=3)?y1:0; if(y<=3) inv+=y1;
-      const accTrust=inv; const retPct=9.0; const retAmt=accTrust*r;
+      const accTrust=inv, retPct=9.0, retAmt=accTrust*r;
       let bonusPct=0, bonusAmt=0;
       if(y===3){bonusPct=2; bonusAmt=y1*0.02;}
       if(y===6){bonusPct=4; bonusAmt=y1*0.04;}
       if(y===10){bonusPct=10; bonusAmt=y1*0.10;}
-      const principalBack=(y===10)?T:0;
-      const annual=retAmt+bonusAmt+principalBack; cum+=annual;
+      const principalBack=(y===10)?T:0, annual=retAmt+bonusAmt+principalBack; cum+=annual;
       rows.push({y,trustAmount,accTrust,retPct,retAmt,bonusPct,bonusAmt,principalBack,annual,cum});
     }
     return rows;
   }
   function rows3F5(T){
     const term=5, r=0.085, y1=T/3; let inv=0, cum=0; const rows=[];
-    for(let y=1;y<=term;y++){ 
+    for(let y=1;y<=term;y++){
       const trustAmount=(y<=3)?y1:0; if(y<=3) inv+=y1;
-      const accTrust=inv; const retPct=8.5; const retAmt=accTrust*r;
+      const accTrust=inv, retPct=8.5, retAmt=accTrust*r;
       let bonusPct=0, bonusAmt=0;
       if(y===3){bonusPct=2; bonusAmt=y1*0.02;}
       if(y===5){bonusPct=4; bonusAmt=y1*0.04;}
-      const principalBack=(y===5)?T:0;
-      const annual=retAmt+bonusAmt+principalBack; cum+=annual;
+      const principalBack=(y===5)?T:0, annual=retAmt+bonusAmt+principalBack; cum+=annual;
       rows.push({y,trustAmount,accTrust,retPct,retAmt,bonusPct,bonusAmt,principalBack,annual,cum});
     }
     return rows;
   }
-  function totals(rows){ return { int: rows.reduce((s,r)=>s+r.retAmt,0), bonus: rows.reduce((s,r)=>s+r.bonusAmt,0), payout: rows.reduce((s,r)=>s+r.annual,0), principal: rows[rows.length-1].accTrust }; }
-  function multiple(totalPayout,totalPrincipal){ return totalPrincipal? (totalPayout/totalPrincipal):0; }
-  function fill(tbodyId, rows){
-    const tb=$(tbodyId); tb.innerHTML="";
-    rows.forEach(r=>{ tb.innerHTML += `<tr>
-      <td>${r.y}</td>
-      <td>${RM(r.trustAmount)}</td>
-      <td>${RM(r.accTrust)}</td>
-      <td>${r.retPct}%</td>
-      <td>${RM(r.retAmt)}</td>
-      <td>${r.bonusPct? r.bonusPct+'%':''}</td>
-      <td>${RM(r.bonusAmt)}</td>
-      <td>${RM(r.principalBack)}</td>
-      <td>${RM(r.annual)}</td>
-      <td>${RM(r.cum)}</td>
-    </tr>`; });
-  }
-  function calc(){
-    const p1=+$("p1P").value||0, p2=+$("p2P").value||0, p3=+$("p3P").value||0;
-    const mode=$("p1Mode").value;
-    const sa=+$("sa").value||0, prem=+$("prem").value||0, premY=+$("premYrs").value||0;
+
+  function renderMain(){
+    const p1=+($('p1P').value||0), p2=+($('p2P').value||0), p3=+($('p3P').value||0);
+    const mode=$('p1Mode').value, sa=+($('sa').value||0), prem=+($('prem').value||0), premY=+($('premYrs').value||0);
     const premTotal=prem*Math.max(0,premY);
+
     const r1=rowsPWT1(p1,mode), r2=rows3F10(p2), r3=rows3F5(p3);
     const t1=totals(r1), t2=totals(r2), t3=totals(r3);
-    const S=$("summary"); S.innerHTML="";
-    function row(n,a,b,c,d){ S.innerHTML += `<tr><td class="left">${n}</td><td>${RM(a)}</td><td>${RM(b)}</td><td>${RM(c)}</td><td>${d}</td></tr>`; }
-    row(lang==="zh"?"本金（计划总额）":"Principal (Total Plan)", t1.principal, t2.principal, t3.principal, "-");
-    row(lang==="zh"?"总利息（不含分红）":"Total Interest (excl. bonus)", t1.int, t2.int, t3.int, "-");
-    row(lang==="zh"?"分红合计":"Total Bonuses", t1.bonus, t2.bonus, t3.bonus, "-");
-    row(lang==="zh"?"总派发（利息+分红+本金）":"Total Payouts (Interest+Bonus+Principal)", t1.payout, t2.payout, t3.payout, "RM "+(Math.round(sa)||0).toLocaleString());
-    row(lang==="zh"?"ALWB 累计保费（年保费×缴费年数）":"ALWB Total Premiums (Annual × Years)", "-", "-", "-", "RM "+(Math.round(premTotal)||0).toLocaleString());
 
-    fill("tb1", r1); fill("tb2", r2); fill("tb3", r3);
+    const S=$('summary'); let shtml="";
+    const row=(n,a,b,c,d)=>{shtml+=`<tr><td class="left">${n}</td><td>${RM(a)}</td><td>${RM(b)}</td><td>${RM(c)}</td><td>${d}</td></tr>`;}
+    row('本金（计划总额）', t1.principal, t2.principal, t3.principal, '-');
+    row('总利息（不含分红）', t1.int, t2.int, t3.int, '-');
+    row('分红合计', t1.bonus, t2.bonus, t3.bonus, '-');
+    row('总派发（利息+分红+本金）', t1.payout, t2.payout, t3.payout, RM(sa));
+    row('ALWB 累计保费（年保费×缴费年数）', '-', '-', '-', RM(premTotal));
+    S.innerHTML=shtml;
 
-    document.getElementById("mult1").textContent = dict[lang].mult.replace("{n}","10").replace("{x}",(t1.payout/t1.principal).toFixed(2));
-    document.getElementById("mult2").textContent = dict[lang].mult.replace("{n}","10").replace("{x}",(t2.payout/t2.principal).toFixed(2));
-    document.getElementById("mult3").textContent = dict[lang].mult.replace("{n}","5").replace("{x}",(t3.payout/t3.principal).toFixed(2));
+    fill('tb1', r1); fill('tb2', r2); fill('tb3', r3);
+    $('mult1').textContent=`Return after 10 years = ${(t1.payout/t1.principal).toFixed(2)} times`;
+    $('mult2').textContent=`Return after 10 years = ${(t2.payout/t2.principal).toFixed(2)} times`;
+    $('mult3').textContent=`Return after 5 years = ${(t3.payout/t3.principal).toFixed(2)} times`;
+
+    $('trustTotal').value = p2;
+    $('lifePrem').value = prem;
   }
 
-  document.getElementById("calc").addEventListener("click", calc);
-  document.getElementById("reset").addEventListener("click", ()=>location.reload());
-  document.getElementById("printBtn").addEventListener("click", ()=>window.print());
-  document.getElementById("lang").addEventListener("change", e=>{ lang=e.target.value; applyI18n(); calc(); });
+  function computePremiumUsingPWT3F10(total, lifePrem, lifeYears, includeBonus){
+    const term=10, r=0.09, y1=total/3;
+    let interest=[], bonus=[], invested=0, accTrust=0;
+    for(let y=1;y<=term;y++){
+      if(y<=3) invested+=y1;
+      accTrust=invested;
+      interest[y]=accTrust*r;
+      bonus[y]=0;
+      if(includeBonus){
+        if(y===3) bonus[y]+=y1*0.02;
+        if(y===6) bonus[y]+=y1*0.04;
+        if(y===10) bonus[y]+=y1*0.10;
+      }
+    }
+    let rows=[], totals={trust:0,interest:0,life:0,bonus:0,pocket:0};
+    invested=0; accTrust=0;
+    for(let y=1;y<=Math.max(term, lifeYears);y++){
+      const trust=(y<=3)?y1:0; if(y<=3) invested+=y1;
+      accTrust=invested;
+      const interestAvail=(y>1 && y-1<=term)?interest[y-1]:0;
+      const bonusAvail=(y>1 && y-1<=term)?bonus[y-1]:0;
+      const life=(y<=lifeYears)?lifePrem:0;
+      const pocket=(interestAvail+bonusAvail)-life;
+      rows.push({y,trustAmount:trust,accTrust,interestFromTrust:interestAvail,lifeInsurance:life,bonus:bonusAvail,pocket});
+      totals.trust+=trust; totals.interest+=interestAvail; totals.life+=life; totals.bonus+=bonusAvail; totals.pocket+=pocket;
+    }
+    return {rows, totals};
+  }
+  function renderPremium(){
+    const total=+document.getElementById('trustTotal').value||0;
+    const life=+document.getElementById('lifePrem').value||0;
+    const years=+document.getElementById('lifeYears').value||0;
+    const includeBonus=document.getElementById('inclBonus').checked;
 
-  applyI18n(); calc();
-})();
+    const out=computePremiumUsingPWT3F10(total, life, years, includeBonus);
+    const tb=document.getElementById('tbPremium'); let html="";
+    out.rows.forEach(r=>{
+      html+=`<tr>
+        <td>${r.y}</td>
+        <td>${r.trustAmount? "- "+RM(r.trustAmount):""}</td>
+        <td>${RM(r.accTrust)}</td>
+        <td>${r.interestFromTrust? "+ "+RM(r.interestFromTrust): RM(0)}</td>
+        <td>${r.lifeInsurance? "- "+RM(r.lifeInsurance):""}</td>
+        <td>${r.bonus? "+ "+RM(r.bonus):""}</td>
+        <td>${(r.pocket>=0? "+ ":"- ")+RM(Math.abs(r.pocket))}</td>
+      </tr>`;
+    });
+    tb.innerHTML=html;
+    const t=out.totals;
+    document.getElementById('premSummary').textContent =
+      `累计：Trust 注资 ${RM(t.trust)} ｜ 利息用于保费 ${RM(t.interest)} ｜ 分红 ${RM(t.bonus)} ｜ 保费总额 ${RM(t.life)} ｜ 净口袋现金 ${(t.pocket>=0?"+ ":"- ")+RM(Math.abs(t.pocket))}`;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', ()=>window.print(), false);
+  document.getElementById('calc').addEventListener('click', ()=>{ renderMain(); renderPremium(); }, false);
+  document.getElementById('reset').addEventListener('click', ()=>location.reload(), false);
+  document.getElementById('btnPrem').addEventListener('click', renderPremium, false);
+
+  setTimeout(()=>{ renderMain(); renderPremium(); }, 0);
+});
 </script>
 </body>
 </html>
